@@ -29,23 +29,20 @@ abstract class PluggableFlowableSpecification extends InternalFlowableSpecificat
 
     private static final String PROCESS_ENGINE = "cachedProcessEngine"
 
+    @SuppressWarnings("unused")
     def setup() throws Exception {
-        try {
-            // Always reset authenticated user to avoid any mistakes
-            processEngine.getIdentityService().setAuthenticatedUserId(null)
-
-            try {
-                AbstractFlowableTestCase.validateHistoryData(processEngine)
-            } finally {
-                doFinally()
-            }
-        } finally {
-            if (AnnotationSupport.isAnnotated(this.getClass(), EnableVerboseExecutionTreeLogging.class)) {
-                swapCommandInvoker(processEngine, false)
-            }
-        }
+        repositoryService = processEngine.getRepositoryService()
+        runtimeService = processEngine.getRuntimeService()
+        taskService = processEngine.getTaskService()
+        formService = processEngine.getFormService()
+        historyService = processEngine.getHistoryService()
+        identityService = processEngine.getIdentityService()
+        managementService = processEngine.getManagementService()
+        dynamicBpmnService = processEngine.getDynamicBpmnService()
+        processMigrationService = processEngine.getProcessMigrationService()
     }
 
+    @SuppressWarnings("unused")
     def cleanup() throws Exception {
         // Always reset authenticated user to avoid any mistakes
         processEngine.getIdentityService().setAuthenticatedUserId(null)

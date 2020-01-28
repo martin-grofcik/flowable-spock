@@ -8,7 +8,17 @@ class OneTaskProcessTest extends PluggableFlowableTestCase {
 
 	@Test
 	@Deployment(resources = "org/crp/flowable/groovy/monitor/oneTask.bpmn20.xml")
-	void oneTaskProcess() {
+	void "start one task process"() {
+		runtimeService.createProcessInstanceBuilder().
+				processDefinitionKey("oneTaskProcess").
+				start()
+
+		assert runtimeService.createProcessInstanceQuery().count() == 1
+	}
+
+	void "start one task process with method deployment"() {
+		deployOneTaskTestProcess()
+
 		runtimeService.createProcessInstanceBuilder().
 				processDefinitionKey("oneTaskProcess").
 				start()
