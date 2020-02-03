@@ -1,4 +1,4 @@
-package org.crp.flowable.groovy.monitor
+package org.crp.flowable.spock.examples
 
 import org.crp.flowable.spock.Deployment
 import org.crp.flowable.spock.PluggableFlowableSpecification
@@ -7,7 +7,7 @@ class OneTaskProcessSpec extends PluggableFlowableSpecification {
 
     def "start one task process with repositoryService deployment"() {
         given:
-            def deployment = repositoryService.createDeployment().addClasspathResource("org/crp/flowable/groovy/monitor/oneTask.bpmn20.xml").deploy()
+            def deployment = repositoryService.createDeployment().addClasspathResource("org/crp/flowable/spock/examples/oneTask.bpmn20.xml").deploy()
         when:
             runtimeService.createProcessInstanceBuilder().
                 processDefinitionKey("oneTaskProcess").
@@ -29,7 +29,7 @@ class OneTaskProcessSpec extends PluggableFlowableSpecification {
             assert runtimeService.createProcessInstanceQuery().count() == 1
     }
 
-    @Deployment(resources = ["org/crp/flowable/groovy/monitor/oneTask.bpmn20.xml"])
+    @Deployment(resources = ["org/crp/flowable/spock/examples/oneTask.bpmn20.xml"])
     def "start one task process with annotation deployment"() {
         when:
             runtimeService.createProcessInstanceBuilder().
@@ -39,4 +39,14 @@ class OneTaskProcessSpec extends PluggableFlowableSpecification {
             assert runtimeService.createProcessInstanceQuery().count() == 1
     }
 
+    def "start one task process with given deployment"() {
+        given:
+            deploy "org/crp/flowable/spock/examples/oneTask.bpmn20.xml"
+        when:
+            runtimeService.createProcessInstanceBuilder().
+                processDefinitionKey("oneTaskProcess").
+                start()
+        then:
+            assert runtimeService.createProcessInstanceQuery().count() == 1
+    }
 }

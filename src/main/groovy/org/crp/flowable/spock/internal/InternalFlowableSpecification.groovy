@@ -12,11 +12,7 @@
  */
 package org.crp.flowable.spock.internal
 
-import org.flowable.bpmn.model.BpmnModel
-import org.flowable.bpmn.model.EndEvent
-import org.flowable.bpmn.model.SequenceFlow
-import org.flowable.bpmn.model.StartEvent
-import org.flowable.bpmn.model.UserTask
+import org.flowable.bpmn.model.*
 import org.flowable.engine.*
 import org.flowable.engine.impl.ProcessEngineImpl
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl
@@ -93,6 +89,10 @@ abstract class InternalFlowableSpecification extends Specification {
             processEngineConfiguration.getRepositoryService().deleteDeployment(autoDeletedDeploymentId, true)
         }
         deploymentIdsForAutoCleanup.clear()
+    }
+
+    String deploy(String classpathResource) {
+        return repositoryService.createDeployment().addClasspathResource(classpathResource).deploy().getId()
     }
 
     /**
