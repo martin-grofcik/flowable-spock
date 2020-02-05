@@ -44,7 +44,7 @@ class ProcessModelBuilder {
     }
 
     static StartEvent startEvent() {
-        return new StartEvent(id : UUID.randomUUID())
+        return new StartEvent(id : 'startEvent')
     }
 
     static StartEvent startEvent(Map<String, Object> properties) {
@@ -52,7 +52,7 @@ class ProcessModelBuilder {
     }
 
     static EndEvent endEvent() {
-        return new EndEvent(id : UUID.randomUUID())
+        return new EndEvent(id : 'endEvent')
     }
 
     static EndEvent endEvent(Map<String, Object> properties) {

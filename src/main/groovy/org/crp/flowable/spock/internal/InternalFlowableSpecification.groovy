@@ -100,7 +100,7 @@ abstract class InternalFlowableSpecification extends Specification {
 
     String deploy(ProcessModelBuilder processModelBuilder) {
         def id = repositoryService.createDeployment().
-                addBpmnModel("$processModelBuilder.name\\.bpmn20.xml" , processModelBuilder.build()).deploy().getId()
+                addBpmnModel("${processModelBuilder.name}.bpmn20.xml" , processModelBuilder.build()).deploy().getId()
         deploymentIdsForAutoCleanup.add(id)
         return id
     }
