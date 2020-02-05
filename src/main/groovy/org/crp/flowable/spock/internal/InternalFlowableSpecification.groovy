@@ -12,6 +12,7 @@
  */
 package org.crp.flowable.spock.internal
 
+import org.crp.flowable.spock.util.ProcessModelBuilder
 import org.flowable.bpmn.model.*
 import org.flowable.engine.*
 import org.flowable.engine.impl.ProcessEngineImpl
@@ -92,7 +93,16 @@ abstract class InternalFlowableSpecification extends Specification {
     }
 
     String deploy(String classpathResource) {
-        return repositoryService.createDeployment().addClasspathResource(classpathResource).deploy().getId()
+        def id = repositoryService.createDeployment().addClasspathResource(classpathResource).deploy().getId()
+        deploymentIdsForAutoCleanup.add(id)
+        return id
+    }
+
+    String deploy(ProcessModelBuilder processModelBuilder) {
+        def id = repositoryService.createDeployment().
+                addBpmnModel("$processModelBuilder.name\\.bpmn20.xml" , processModelBuilder.build()).deploy().getId()
+        deploymentIdsForAutoCleanup.add(id)
+        return id
     }
 
     /**
@@ -112,14 +122,14 @@ abstract class InternalFlowableSpecification extends Specification {
 
     static BpmnModel createOneTaskTestProcess() {
         BpmnModel model = new BpmnModel()
-        org.flowable.bpmn.model.Process process = createOneTaskProcess()
+        Process process = createOneTaskProcess()
         model.addProcess(process)
 
         return model
     }
 
-    static org.flowable.bpmn.model.Process createOneTaskProcess() {
-        org.flowable.bpmn.model.Process process = new org.flowable.bpmn.model.Process()
+    static Process createOneTaskProcess() {
+        Process process = new Process()
         process.setId("oneTaskProcess")
         process.setName("The one task process")
 

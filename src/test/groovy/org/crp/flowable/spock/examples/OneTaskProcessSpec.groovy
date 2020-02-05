@@ -3,6 +3,11 @@ package org.crp.flowable.spock.examples
 import org.crp.flowable.spock.Deployment
 import org.crp.flowable.spock.PluggableFlowableSpecification
 
+import static org.crp.flowable.spock.util.ProcessModelBuilder.endEvent
+import static org.crp.flowable.spock.util.ProcessModelBuilder.model
+import static org.crp.flowable.spock.util.ProcessModelBuilder.startEvent
+import static org.crp.flowable.spock.util.ProcessModelBuilder.userTask
+
 class OneTaskProcessSpec extends PluggableFlowableSpecification {
 
     def "start one task process with repositoryService deployment"() {
@@ -42,6 +47,17 @@ class OneTaskProcessSpec extends PluggableFlowableSpecification {
     def "start one task process with given deployment"() {
         given:
             deploy "org/crp/flowable/spock/examples/oneTask.bpmn20.xml"
+        when:
+            runtimeService.createProcessInstanceBuilder().
+                processDefinitionKey("oneTaskProcess").
+                start()
+        then:
+            assert runtimeService.createProcessInstanceQuery().count() == 1
+    }
+
+    def 'create one task process with builder'() {
+        given:
+            deploy model('oneTaskProcess') >> startEvent() >> userTask(id: 'userTask') >> endEvent()
         when:
             runtimeService.createProcessInstanceBuilder().
                 processDefinitionKey("oneTaskProcess").
