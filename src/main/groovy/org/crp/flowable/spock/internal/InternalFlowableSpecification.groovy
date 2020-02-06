@@ -13,17 +13,17 @@
 package org.crp.flowable.spock.internal
 
 import org.crp.flowable.spock.util.ProcessModelBuilder
-import org.flowable.bpmn.model.*
 import org.flowable.engine.*
 import org.flowable.engine.impl.ProcessEngineImpl
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl
 import org.flowable.engine.impl.history.DefaultHistoryManager
 import org.flowable.engine.impl.history.HistoryManager
-import org.flowable.engine.repository.Deployment
-import org.flowable.engine.repository.ProcessDefinition
 import org.flowable.job.api.HistoryJob
 import spock.lang.Specification
 
+/**
+ * author martin.grofcik
+ */
 abstract class InternalFlowableSpecification extends Specification {
     protected static List<String> deploymentIdsForAutoCleanup = new ArrayList<>()
 
@@ -104,55 +104,4 @@ abstract class InternalFlowableSpecification extends Specification {
         deploymentIdsForAutoCleanup.add(id)
         return id
     }
-
-    /**
-     * Creates and deploys the one task process. See {@link #createOneTaskTestProcess()}.
-     *
-     * @return The process definition id (NOT the process definition key) of deployed one task process.
-     */
-    String deployOneTaskTestProcess() {
-        BpmnModel bpmnModel = createOneTaskTestProcess()
-        Deployment deployment = repositoryService.createDeployment().addBpmnModel("oneTasktest.bpmn20.xml", bpmnModel).deploy()
-
-        deploymentIdsForAutoCleanup.add(deployment.getId()) // For auto-cleanup
-
-        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).singleResult()
-        return processDefinition.getId()
-    }
-
-    static BpmnModel createOneTaskTestProcess() {
-        BpmnModel model = new BpmnModel()
-        Process process = createOneTaskProcess()
-        model.addProcess(process)
-
-        return model
-    }
-
-    static Process createOneTaskProcess() {
-        Process process = new Process()
-        process.setId("oneTaskProcess")
-        process.setName("The one task process")
-
-        StartEvent startEvent = new StartEvent()
-        startEvent.setId("start")
-        startEvent.setName("The start")
-        process.addFlowElement(startEvent)
-
-        UserTask userTask = new UserTask()
-        userTask.setName("The Task")
-        userTask.setId("theTask")
-        userTask.setAssignee("kermit")
-        process.addFlowElement(userTask)
-
-        EndEvent endEvent = new EndEvent()
-        endEvent.setId("theEnd")
-        endEvent.setName("The end")
-        process.addFlowElement(endEvent)
-
-        process.addFlowElement(new SequenceFlow("start", "theTask"))
-        process.addFlowElement(new SequenceFlow("theTask", "theEnd"))
-
-        return process
-    }
-
 }

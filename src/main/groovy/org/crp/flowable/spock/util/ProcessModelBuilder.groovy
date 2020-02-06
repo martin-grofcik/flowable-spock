@@ -63,4 +63,8 @@ class ProcessModelBuilder {
         return new UserTask(properties)
     }
 
+    static ScriptTask scriptTask(Map<String, Object> properties) {
+        return new ScriptTask(properties)
+    }
+
 }

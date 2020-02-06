@@ -2,9 +2,13 @@ package org.crp.flowable.spock.examples
 
 import org.crp.flowable.spock.Deployment
 import org.crp.flowable.spock.PluggableFlowableSpecification
+import org.flowable.bpmn.model.ReceiveTask
+import org.flowable.engine.runtime.ProcessInstance
 
+import static org.assertj.core.api.Assertions.assertThat
 import static org.crp.flowable.spock.util.ProcessModelBuilder.endEvent
 import static org.crp.flowable.spock.util.ProcessModelBuilder.model
+import static org.crp.flowable.spock.util.ProcessModelBuilder.scriptTask
 import static org.crp.flowable.spock.util.ProcessModelBuilder.startEvent
 import static org.crp.flowable.spock.util.ProcessModelBuilder.userTask
 
@@ -21,17 +25,6 @@ class OneTaskProcessSpec extends PluggableFlowableSpecification {
             assert runtimeService.createProcessInstanceQuery().count() == 1
         cleanup:
             repositoryService.deleteDeployment(deployment.id, true)
-    }
-
-    def "start one task process with method deployment"() {
-        given:
-            deployOneTaskTestProcess()
-        when:
-            runtimeService.createProcessInstanceBuilder().
-                processDefinitionKey("oneTaskProcess").
-                start()
-        then:
-            assert runtimeService.createProcessInstanceQuery().count() == 1
     }
 
     @Deployment(resources = ["org/crp/flowable/spock/examples/oneTask.bpmn20.xml"])
@@ -64,5 +57,26 @@ class OneTaskProcessSpec extends PluggableFlowableSpecification {
                 start()
         then:
             assert runtimeService.createProcessInstanceQuery().count() == 1
+    }
+
+    def 'create script task process with builder'() {
+        given:
+            deploy model('scriptTaskProcess') >> startEvent() >> scriptTask(id: 'scriptTask', scriptFormat: 'groovy',
+                    script: '''
+                        execution.with {
+                            setVariable 'newVariable', 'newVariableValue'
+                        }
+                    '''
+            ) >> new ReceiveTask(id:'receiveTask') >> endEvent()
+
+        when:
+            ProcessInstance pi = runtimeService.createProcessInstanceBuilder().
+                processDefinitionKey("scriptTaskProcess").
+                start()
+
+        then:
+            assert runtimeService.hasVariable(pi.getId(), 'newVariable')
+            assertThat runtimeService.getVariable(pi.getId(), 'newVariable') isEqualTo 'newVariableValue'
+
     }
 }
