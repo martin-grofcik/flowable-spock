@@ -76,4 +76,28 @@ class OneTaskProcessSpec extends PluggableFlowableSpecification {
             assertThat runtimeService.getVariable(pi.getId(), 'newVariable') isEqualTo 'newVariableValue'
     }
 
+    @Newify(ReceiveTask)
+    def 'DSL setVariable'() {
+        given:
+            deploy model('scriptTaskProcess') >> startEvent() >> scriptTask(id: 'scriptTask', scriptFormat: 'groovy',
+                    script: "$script"
+            ) >> ReceiveTask(id:'receiveTask') >> endEvent()
+
+        when:
+            ProcessInstance pi = runtimeService.createProcessInstanceBuilder().
+                processDefinitionKey("scriptTaskProcess").
+                start()
+
+        then:
+            assert runtimeService.hasVariable(pi.getId(), 'newVariable')
+            assertThat runtimeService.getVariable(pi.getId(), 'newVariable') isEqualTo 'newVariableValue'
+
+        where:
+        script = [
+                'execution.setVariable("newVariable", "newVariableValue")',
+                'execution.newVariable = "newVariableValue"',
+                'execution.with { newVariable = "newVariableValue"}'
+        ]
+    }
+
 }
