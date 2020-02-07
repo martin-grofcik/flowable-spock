@@ -6,11 +6,7 @@ import org.flowable.bpmn.model.ReceiveTask
 import org.flowable.engine.runtime.ProcessInstance
 
 import static org.assertj.core.api.Assertions.assertThat
-import static org.crp.flowable.spock.util.ProcessModelBuilder.endEvent
-import static org.crp.flowable.spock.util.ProcessModelBuilder.model
-import static org.crp.flowable.spock.util.ProcessModelBuilder.scriptTask
-import static org.crp.flowable.spock.util.ProcessModelBuilder.startEvent
-import static org.crp.flowable.spock.util.ProcessModelBuilder.userTask
+import static org.crp.flowable.spock.util.ProcessModelBuilder.*
 
 class OneTaskProcessSpec extends PluggableFlowableSpecification {
 
@@ -59,6 +55,7 @@ class OneTaskProcessSpec extends PluggableFlowableSpecification {
             assert runtimeService.createProcessInstanceQuery().count() == 1
     }
 
+    @Newify(ReceiveTask)
     def 'create script task process with builder'() {
         given:
             deploy model('scriptTaskProcess') >> startEvent() >> scriptTask(id: 'scriptTask', scriptFormat: 'groovy',
@@ -67,7 +64,7 @@ class OneTaskProcessSpec extends PluggableFlowableSpecification {
                             setVariable 'newVariable', 'newVariableValue'
                         }
                     '''
-            ) >> new ReceiveTask(id:'receiveTask') >> endEvent()
+            ) >> ReceiveTask(id:'receiveTask') >> endEvent()
 
         when:
             ProcessInstance pi = runtimeService.createProcessInstanceBuilder().
@@ -77,6 +74,6 @@ class OneTaskProcessSpec extends PluggableFlowableSpecification {
         then:
             assert runtimeService.hasVariable(pi.getId(), 'newVariable')
             assertThat runtimeService.getVariable(pi.getId(), 'newVariable') isEqualTo 'newVariableValue'
-
     }
+
 }
